@@ -12,15 +12,21 @@ services:
             - ./:/app
         depends_on:
             - mariadb
-        environment:
-            DB_HOST: mariadb
-            DB_PORT: 3306
-            DB_DATABASE: ${MARIADB_DATABASE}
-            DB_USERNAME: ${MARIADB_USERNAME}
-            DB_PASSWORD: ${MARIADB_PASSWORD}
+            - rabbitmq
+
+        env_file:
+            - .env
+#        environment:
+#            DB_HOST: mariadb
+#            DB_PORT: 3306
+#            DB_DATABASE: ${MARIADB_DATABASE}
+#            DB_USERNAME: ${MARIADB_USERNAME}
+#            DB_PASSWORD: ${MARIADB_PASSWORD}
+#            RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+#            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
         ports:
-            - "8378:8378"
-#        command: sh -c "composer install"
+            - ${APP_PORT}:8000
+        # command: sh -c "composer install"
 
     mariadb:
         image: mariadb:10.11.3
@@ -39,19 +45,22 @@ services:
 
 
 
-#    rabbitmq:
-#        image: rabbitmq:3.12.4
-#        container_name: rabbitmq
-#        hostname: rabbitmq
-#        ports:
-#            - ${RABBITMQ_AMQP_PORT}:5672  # порт для AMQP
-#            - ${RABBITMQ_UI_PORT}:15672  # порт для RabbitMQ Management UI
-#        volumes:
-#            - ./docker/storages/rabbitmq:/var/lib/rabbitmq/mnesia
+    rabbitmq:
+        image: rabbitmq:3.12.4-management
+        container_name: rabbitmq
+        hostname: rabbitmq
+        ports:
+            - ${RABBITMQ_AMQP_PORT}:5672
+            - ${RABBITMQ_UI_PORT}:15672
+        volumes:
+            - ./docker/storages/rabbitmq:/var/lib/rabbitmq/mnesia
 
-#        environment:
+        environment:
+            RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+
 #            RABBITMQ_ERLANG_COOKIE: "qwerty12"  # cookie для Erlang
-#    RABBITMQ_DEFAULT_USER=user -e RABBITMQ_DEFAULT_PASS=password
+#            RABBITMQ_DEFAULT_USER=user -e RABBITMQ_DEFAULT_PASS=password
 
 
 

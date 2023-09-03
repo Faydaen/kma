@@ -7,22 +7,28 @@ require_once __DIR__ . '/vendor/autoload.php';
 //// убираем ограничение по времени
 //set_time_limit(0);
 //
-//const MIN_SECONDS = 5;
-//const MAX_SECONDS = 30;
-//
-//$urls = [
-//    'https://kma.biz/',
-//    'https://github.com/',
-//    'https://hh.ru/',
-//    'https://www.youtube.com/',
-//    'https://www.instagram.com/',
-//    'https://habr.com/',
-//    'https://ru.wikipedia.org/',
-//    'https://www.docker.com/',
-//    'https://huggingface.co/',
-//    'https://www.google.com/',
-//    'https://swagger.io/',
-//];
+const MIN_SECONDS = 5;
+const MAX_SECONDS = 30;
+
+$urls = [
+    'https://kma.biz/',
+    'https://github.com/',
+    'https://hh.ru/',
+    'https://www.youtube.com/',
+    'https://www.instagram.com/',
+    'https://habr.com/',
+    'https://ru.wikipedia.org/',
+    'https://www.docker.com/',
+    'https://huggingface.co/',
+    'https://www.google.com/',
+    'https://swagger.io/',
+];
+
+
+//echo 12;
+
+$queue = new \App\Queue();
+
 //
 //echo "start<br>".PHP_EOL;
 //foreach ($urls as $url){
@@ -40,10 +46,14 @@ require_once __DIR__ . '/vendor/autoload.php';
 //}
 
 
-$repository = Repository::getInstance();
-$a = $repository::query("SELECT * FROM parse_results");
-var_dump($a);
+//$repository = Repository::getInstance();
+//$a = $repository::query("SELECT * FROM parse_results");
+//var_dump($a);
 
+
+
+
+//$channel = $connection->channel();
 
 //------
 
@@ -59,8 +69,4 @@ var_dump($a);
 
 
 
-//use PhpAmqpLib\Connection\AMQPStreamConnection;
-//use PhpAmqpLib\Message\AMQPMessage;
-//
-//$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
-////$channel = $connection->channel();
+

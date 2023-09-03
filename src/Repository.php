@@ -10,23 +10,24 @@ class Repository
 {
     public static Repository $instance;
     private static PDO $pdo;
-    protected function __construct()
+    private function __construct()
     {
     }
-    protected function __clone()
+    private function __clone()
     {
     }
 
-    private static function init(): void
+    private static function connect(): void
     {
         try {
-            // конфигурацию подключения берем из переменных окружения
-            $username = env('DB_USERNAME');
-            $password = env('DB_PASSWORD');
-            $host = env('DB_HOST');
-            $port = env('DB_PORT');
-            $database = env('DB_DATABASE');
+            // конфигурацию подключения либо находится в переменных окружения либо указаны в docker-compose.yaml
+            $host = 'mariadb';
+            $port = '3306';
+            $username = env('MARIADB_USERNAME');
+            $password = env('MARIADB_PASSWORD');
+            $database = env('MARIADB_DATABASE');
 
+            var_dump($port);
             // подключаемся к базе данных
             self::$pdo = new PDO("mysql:host=$host:$port;dbname=$database", $username, $password);
 
@@ -37,14 +38,13 @@ class Repository
         } catch (Exception $e) {
             die($e->getMessage());
         }
-
     }
 
     public static function getInstance(): Repository
     {
         if (!isset(self::$instance)) {
             self::$instance = new static();
-            self::$instance::init();
+            self::$instance::connect();
         }
 
         return self::$instance;
@@ -58,8 +58,4 @@ class Repository
             die("Ошибка выполнения запроса: " . $e->getMessage());
         }
     }
-
-
-
-
 }
