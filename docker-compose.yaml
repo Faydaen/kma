@@ -1,6 +1,35 @@
 version: '3'
 
 services:
+
+    app:
+        build:
+            context: ./docker/app
+        image: app
+        container_name: app
+        hostname: kma
+        volumes:
+            - ./:/app
+        depends_on:
+            - mariadb
+#            - nginx
+        environment:
+            DB_HOST: db
+            DB_PORT: 3306
+            DB_DATABASE: ${MARIADB_DATABASE}
+            DB_USERNAME: ${MARIADB_USERNAME}
+            DB_PASSWORD: ${MARIADB_PASSWORD}
+
+#    nginx:
+#        image: nginx:1.23.4
+#        container_name: nginx
+#        hostname: nginx
+#        ports:
+#            - "8080:80"
+#        volumes:
+#            - ./:/app
+#            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+
     mariadb:
         image: mariadb:10.11.3
         container_name: mariadb
@@ -13,5 +42,31 @@ services:
         ports:
             - ${MARIADB_PORT}:3306
         volumes:
-            - ./docker/database/store:/var/lib/mysql
-            - ./docker/database/init/:/docker-entrypoint-initdb.d
+            - ./docker/storages/mariadb:/var/lib/mysql
+            - ./docker/mariadb/init/:/docker-entrypoint-initdb.d
+
+
+
+#    rabbitmq:
+#        image: rabbitmq:3.12.4
+#        container_name: rabbitmq
+#        hostname: rabbitmq
+#        ports:
+#            - ${RABBITMQ_AMQP_PORT}:5672  # порт для AMQP
+#            - ${RABBITMQ_UI_PORT}:15672  # порт для RabbitMQ Management UI
+#        volumes:
+#            - ./docker/storages/rabbitmq:/var/lib/rabbitmq/mnesia
+
+#        environment:
+#            RABBITMQ_ERLANG_COOKIE: "qwerty12"  # cookie для Erlang
+#    RABBITMQ_DEFAULT_USER=user -e RABBITMQ_DEFAULT_PASS=password
+
+
+
+#
+
+#
+
+
+
+
