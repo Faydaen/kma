@@ -2,17 +2,14 @@
 
 namespace App;
 
-use App\Enums_\Channel;
 use Exception;
-use PhpAmqpLib\Channel\AbstractChannel;
+use App\Enums\Channel;
+use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Message\AMQPMessage;
 
 class QueueManager
 {
-    const ROUTING_KEY = 'urls_to_parse';
-
     private array $eventHandlers = [];
     private AMQPChannel $channel;
     private AMQPStreamConnection $connection;
@@ -27,8 +24,8 @@ class QueueManager
         try {
             $host = 'rabbitmq';
             $port = '5672';
-            $user = env('RABBITMQ_DEFAULT_USER');
-            $password = env('RABBITMQ_DEFAULT_PASS');
+            $user = getenv('RABBITMQ_DEFAULT_USER');
+            $password = getenv('RABBITMQ_DEFAULT_PASS');
             $this->connection = new AMQPStreamConnection($host, $port, $user, $password);
             // подключение будет одноканальным
             $this->channel = $this->connection->channel();
@@ -47,39 +44,22 @@ class QueueManager
         $this->channel->basic_publish($msg, '', $chanel->value);
     }
 
-
-
-    public function listen(Channel $chanel, callable $callback)
+    public function listen(Channel $chanel, callable $callback): void
     {
         // получаем/создаём очередь с нужным ключом
         $this->channel->queue_declare($chanel->value, false, false, false, false);
 
+        // передаём туда callback
         $this->channel->basic_consume($chanel->value, '', false, true, false, false, $callback);
-
-//        while (count($this->channel->callbacks)) {
-//            $this->channel->wait();
-//        }
-//
-////        while ($this->channel->is_open()) {
-////            $this->channel->wait();
-////        }
-////
-////        $this->channel->close();
-////        $this->connection->close();
-//
-//        echo '::finish::'.PHP_EOL;
-
-//
-
     }
 
-    public function awaitLoop(){
+    public function awaitLoop() : void
+    {
         while (count($this->channel->callbacks)) {
             $this->channel->wait();
         }
 
     }
-
 
     public function closeConnection(): void
     {
@@ -90,5 +70,4 @@ class QueueManager
             die($e->getMessage());
         }
     }
-
 }
