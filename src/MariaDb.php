@@ -11,9 +11,11 @@ class MariaDb
 
     public static MariaDb $instance;
     private static PDO $pdo;
+
     private function __construct()
     {
     }
+
     private function __clone()
     {
     }
@@ -23,7 +25,7 @@ class MariaDb
         try {
             // конфигурацию подключения либо находится в переменных окружения либо указаны в docker-compose.yaml
             $host = 'mariadb';
-            $port = '8123';
+            $port = '3306';
             $username = getenv('MARIADB_USERNAME');
             $password = getenv('MARIADB_PASSWORD');
             $database = getenv('MARIADB_DATABASE');
@@ -50,9 +52,15 @@ class MariaDb
         return self::$instance;
     }
 
-    public static function query(string $query) : array {
+    public static function insert(string $query, array $params): void
+    {
+        self::getInstance()::$pdo->prepare($query)->execute($params);
+    }
+
+    public static function query(string $query, array $params = []): array
+    {
         try {
-            $result = self::$pdo->query($query);
+            $result = self::getInstance()::$pdo->query($query);
             return $result->fetchAll();
         } catch (PDOException $e) {
             die("Ошибка выполнения запроса: " . $e->getMessage());

@@ -31,16 +31,16 @@ function getContentLength(string $url): int
 {
     $ch = curl_init($url);
 
-    // настроим параметры запроса
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_NOBODY, true);
+    // параметры запроса
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // не выводим ничего (возвращаем в виде строки)
+    curl_setopt($ch, CURLOPT_NOBODY, true); // не получаем тело запроса (длину получим из заголовка)
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5); // ожидание соединения в секундах
     curl_setopt($ch, CURLOPT_TIMEOUT, 10); // ожидание ответа в секундах
 
-    // выполняем запрос
+    // делаем запрос
     $response = curl_exec($ch);
 
-    // проверим на наличие ошибок
+    // проверяем на ошибки
     if ($response === false) {
         $error = curl_error($ch);
         curl_close($ch);

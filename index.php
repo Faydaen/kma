@@ -5,15 +5,16 @@ use function App\getContentLength;
 require_once __DIR__ . '/vendor/autoload.php';
 
 
-
-// Пример использования
-try {
-    $url = "https://www.example.com";
-    $length = getContentLength($url);
-    echo "Длина контента по URL $url: $length байтов";
-} catch (Exception $e) {
-    echo "Ошибка: " . $e->getMessage();
-}
+$a = \App\MariaDb::query("SELECT * FROM parse_results");
+var_dump($a);
+//// Пример использования
+//try {
+//    $url = "https://www.example.com";
+//    $length = getContentLength($url);
+//    echo "Длина контента по URL $url: $length байтов";
+//} catch (Exception $e) {
+//    echo "Ошибка: " . $e->getMessage();
+//}
 
 //$myVar = getenv('CLICKHOUSE_USER');
 //echo $myVar;

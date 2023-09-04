@@ -2,26 +2,35 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use App\Enums\Channel;
+use App\MariaDb;
 use App\QueueManager;
-use PhpAmqpLib\Message\AMQPMessage;
+use App\Enums\Channel;
 use function App\getContentLength;
+use PhpAmqpLib\Message\AMQPMessage;
 
 $queue = new QueueManager();
 
 
 $parseUrl = function (AMQPMessage $msg) {
 
-//    $url = $msg->body;
-////    $contentLength = 0;
-//    try {
-//        $contentLength = getContentLength($url);
-//    } catch (Exception $e) {
-//        echo "Ошибка: " . $e->getMessage();
-//    }
-//
-//    \App\MariaDb::query("INSERT INTO  (url, content_length) VALUES (value1, value2, value3,...valueN);");
+    $url = $msg->body;
+    try {
+        echo 'Определяем длину контента для ' . $url . PHP_EOL;
+        $contentLength = getContentLength($url);
+    } catch (Exception $e) {
+        echo 'Ошибка: ' . $e->getMessage() . PHP_EOL;
+        return;
+    }
 
+    echo 'Длина = ' . $contentLength . ' байт' . PHP_EOL;;
+
+    // делаем запрос
+    $sql = 'INSERT INTO parse_results (url, content_length) VALUES (:url, :content_length)';
+    $params = [
+        'url' => $msg->body,
+        'content_length' => $contentLength
+    ];
+    MariaDb::query($sql, $params);
     echo $msg->body;
 
     echo PHP_EOL;
