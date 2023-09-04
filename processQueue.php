@@ -1,10 +1,10 @@
 <?php
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 use App\enums\Channel;
 use App\QueueManager;
 use PhpAmqpLib\Message\AMQPMessage;
-
-require_once __DIR__ . '/vendor/autoload.php';
 
 $queue = new QueueManager();
 

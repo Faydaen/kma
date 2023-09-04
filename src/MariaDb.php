@@ -6,9 +6,10 @@ use PDO;
 use Exception;
 use PDOException;
 
-class Repository
+class MariaDb
 {
-    public static Repository $instance;
+
+    public static MariaDb $instance;
     private static PDO $pdo;
     private function __construct()
     {
@@ -27,7 +28,6 @@ class Repository
             $password = env('MARIADB_PASSWORD');
             $database = env('MARIADB_DATABASE');
 
-            var_dump($port);
             // подключаемся к базе данных
             self::$pdo = new PDO("mysql:host=$host:$port;dbname=$database", $username, $password);
 
@@ -40,7 +40,7 @@ class Repository
         }
     }
 
-    public static function getInstance(): Repository
+    public static function getInstance(): MariaDb
     {
         if (!isset(self::$instance)) {
             self::$instance = new static();
