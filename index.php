@@ -1,12 +1,13 @@
 <?php
 
-use App\Repository;
+use App\enums\Channel;
+use App\QueueManager;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-//// убираем ограничение по времени
-//set_time_limit(0);
-//
+// убираем ограничение по времени
+set_time_limit(0);
+
 const MIN_SECONDS = 5;
 const MAX_SECONDS = 30;
 
@@ -24,39 +25,22 @@ $urls = [
     'https://swagger.io/',
 ];
 
+$queue = new QueueManager();
+foreach ($urls as $url){
 
-//echo 12;
+    $queue->sendMessage($url, Channel::PARSE_URL);
 
-$queue = new \App\Queue();
+    // если есть следующий урл в массиве, то делам задержку
+    $delay = mt_rand(MIN_SECONDS, MAX_SECONDS);
+    if( !next( $urls ) ) {
+//        sleep($delay);
+    }
+}
 
-//
-//echo "start<br>".PHP_EOL;
-//foreach ($urls as $url){
-//
-//    $delay = mt_rand(MIN_SECONDS, MAX_SECONDS);
-//    send($url, $delay);
-//    sleep($delay);
-//}
-//
-//echo "end";
-//
-//function send($url, $delay){
-//echo (new DateTime())->format('c');
-//echo ' '.$url.'now will await for '.$delay.' seconds<br>'.PHP_EOL;
-//}
+// это сообщение будет обозначать что нужно сделать запрос в базу данных для выборки
+$queue->sendMessage('', Channel::SQL_QUERY);
 
-
-//$repository = Repository::getInstance();
-//$a = $repository::query("SELECT * FROM parse_results");
-//var_dump($a);
-
-
-
-
-//$channel = $connection->channel();
-
-//------
-
+$queue->closeConnection();
 
 
 

@@ -13,20 +13,11 @@ services:
         depends_on:
             - mariadb
             - rabbitmq
-
+#            - clickhouse
         env_file:
             - .env
-#        environment:
-#            DB_HOST: mariadb
-#            DB_PORT: 3306
-#            DB_DATABASE: ${MARIADB_DATABASE}
-#            DB_USERNAME: ${MARIADB_USERNAME}
-#            DB_PASSWORD: ${MARIADB_PASSWORD}
-#            RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
-#            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
         ports:
             - ${APP_PORT}:8000
-        # command: sh -c "composer install"
 
     mariadb:
         image: mariadb:10.11.3
@@ -43,8 +34,6 @@ services:
             - ./docker/storages/mariadb:/var/lib/mysql
             - ./docker/mariadb/init/:/docker-entrypoint-initdb.d
 
-
-
     rabbitmq:
         image: rabbitmq:3.12.4-management
         container_name: rabbitmq
@@ -54,20 +43,25 @@ services:
             - ${RABBITMQ_UI_PORT}:15672
         volumes:
             - ./docker/storages/rabbitmq:/var/lib/rabbitmq/mnesia
-
         environment:
             RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
             RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
 
-#            RABBITMQ_ERLANG_COOKIE: "qwerty12"  # cookie для Erlang
-#            RABBITMQ_DEFAULT_USER=user -e RABBITMQ_DEFAULT_PASS=password
 
-
-
+    clickhouse:
+        image: yandex/clickhouse-server
+        container_name: clickhouse
+        ports:
+            - "8123:8123" # HTTP-порт для обработки запросов
+            - "9000:9000" # Native-порт для клиентов ClickHouse
+            - "9009:9009" # Native-порт для репликации
+        volumes:
+            - ./docker/storages/clickhouse:/var/lib/clickhouse
+#            - /path/to/clickhouse-config:/etc/clickhouse-server
+        environment:
+            - CLICKHOUSE_PASSWORD=my_password
+#        networks:
+#            - clickhouse-network
 #
-
-#
-
-
-
-
+#networks:
+#    clickhouse-network:
