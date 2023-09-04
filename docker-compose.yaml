@@ -10,12 +10,27 @@ services:
         hostname: app
         volumes:
             - ./:/app
+#        ports:
+#            - "8000:8000"
         depends_on:
             - mariadb
             - rabbitmq
             - clickhouse
         env_file:
             - .env
+
+    rabbitmq:
+        image: rabbitmq:3.12.4-management
+        container_name: rabbitmq
+        hostname: rabbitmq
+        ports:
+            - ${RABBITMQ_UI_HOST_PORT}:15672
+        volumes:
+            - ./docker/storages/rabbitmq:/var/lib/rabbitmq/mnesia
+        environment:
+            RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+
 
     mariadb:
         image: mariadb:10.11.3
@@ -32,29 +47,21 @@ services:
             - ./docker/storages/mariadb:/var/lib/mysql
             - ./docker/mariadb/init/:/docker-entrypoint-initdb.d
 
-    rabbitmq:
-        image: rabbitmq:3.12.4-management
-        container_name: rabbitmq
-        hostname: rabbitmq
-        ports:
-            - ${RABBITMQ_UI_HOST_PORT}:15672
-        volumes:
-            - ./docker/storages/rabbitmq:/var/lib/rabbitmq/mnesia
-        environment:
-            RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
-            RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
-
     clickhouse:
         image: yandex/clickhouse-server
         container_name: clickhouse
         hostname: clickhouse
         ports:
             - ${CLICKHOUSE_HOST_HTTP_PORT}:8123
+#            - "9000:9000"
         volumes:
             - ./docker/storages/clickhouse:/var/lib/clickhouse
-#            - ./docker/clickhouse/init/:/docker-entrypoint-initdb.d
+            - ./docker/clickhouse/init/:/docker-entrypoint-initdb.d
         environment:
             CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
             CLICKHOUSE_USER: ${CLICKHOUSE_USER}
             CLICKHOUSE_DB: ${CLICKHOUSE_DB}
+
+
+
 

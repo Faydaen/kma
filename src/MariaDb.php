@@ -23,7 +23,7 @@ class MariaDb
         try {
             // конфигурацию подключения либо находится в переменных окружения либо указаны в docker-compose.yaml
             $host = 'mariadb';
-            $port = '3306';
+            $port = '8123';
             $username = env('MARIADB_USERNAME');
             $password = env('MARIADB_PASSWORD');
             $database = env('MARIADB_DATABASE');

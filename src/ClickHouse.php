@@ -20,12 +20,12 @@ class ClickHouse
             // конфигурацию подключения либо находится в переменных окружения либо указаны в docker-compose.yaml
             $host = 'clickhouse';
             $port = '3306';
-            $username = env('CLICKHOUSE_USERNAME');
-            $password = env('CLICKHOUSE_PASSWORD');
-            $database = env('CLICKHOUSE_DATABASE');
+            $username = getenv('CLICKHOUSE_USER');
+            $password = getenv('CLICKHOUSE_PASSWORD');
+            $database = getenv('CLICKHOUSE_DB');
 
             // подключаемся к базе данных
-            $this->pdo = new PDO("mysql:host=$host:$port;dbname=$database", $username, $password);
+            $this->pdo = new PDO("clickhouse:host=$host:$port;dbname=$database", $username, $password);
 
             // просим получать результаты в формате ассоциативного массива
             $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
