@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use App\enums\Channel;
+use App\Enums_\Channel;
 use App\QueueManager;
 
 // убираем ограничение по времени

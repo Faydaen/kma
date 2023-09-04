@@ -2,7 +2,7 @@
 
 namespace App;
 
-use App\enums\Channel;
+use App\Enums_\Channel;
 use Exception;
 use PhpAmqpLib\Channel\AbstractChannel;
 use PhpAmqpLib\Channel\AMQPChannel;
