@@ -45,9 +45,9 @@ class ClickHouse
     {
         $host = 'clickhouse';
         $port = '8123';
+        $database = 'db';
         $username = getenv('CLICKHOUSE_USER');
         $password = getenv('CLICKHOUSE_PASSWORD');
-        $database = getenv('CLICKHOUSE_DB');
 
         $url = "http://$username:$password@$host:$port?database=$database";
 

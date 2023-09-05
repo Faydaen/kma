@@ -1,4 +1,4 @@
-CREATE TABLE parse_results
+CREATE TABLE IF NOT EXISTS parse_results
 (
     id             int          NOT NULL AUTO_INCREMENT,
     url            VARCHAR(256) NOT NULL,

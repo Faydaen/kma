@@ -104,15 +104,16 @@ SELECT
     min(ParseDate) AS first_message_time,
     max(ParseDate) AS last_message_time
 FROM
-    your_table
+    parse_results
 GROUP BY
-    minute_start
+    minute
 ORDER BY
-    minute_start;
+    minute;
 SQL;
 
     echo '--------- Запрос к clickHouse: --------- ' . PHP_EOL;
-    $result = $clickHouseClient->query('SELECT * FROM parse_results');
+    $result = $clickHouseClient->query($sql);
+
     printQueryResult($result);
 }
 

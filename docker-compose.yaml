@@ -35,7 +35,7 @@ services:
         container_name: mariadb
         hostname: mariadb
         environment:
-            MARIADB_DATABASE: ${MARIADB_DATABASE}
+            MARIADB_DATABASE: db
             MYSQL_USER: ${MARIADB_USERNAME}
             MARIADB_ROOT_PASSWORD: ${MARIADB_PASSWORD}
             MYSQL_PASSWORD: ${MARIADB_PASSWORD}
@@ -57,7 +57,7 @@ services:
         environment:
             CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD}
             CLICKHOUSE_USER: ${CLICKHOUSE_USER}
-            CLICKHOUSE_DB: ${CLICKHOUSE_DB}
+            CLICKHOUSE_DB: db
 
 
 

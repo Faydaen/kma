@@ -26,9 +26,9 @@ class MariaDb
             // конфигурацию подключения либо находится в переменных окружения либо указаны в docker-compose.yaml
             $host = 'mariadb';
             $port = '3306';
+            $database = 'db';
             $username = getenv('MARIADB_USERNAME');
             $password = getenv('MARIADB_PASSWORD');
-            $database = getenv('MARIADB_DATABASE');
 
             // подключаемся к базе данных
             self::$pdo = new PDO("mysql:host=$host:$port;dbname=$database", $username, $password);
@@ -70,6 +70,4 @@ class MariaDb
             die('Ошибка выполнения запроса: ' . $e->getMessage());
         }
     }
-
-
 }
