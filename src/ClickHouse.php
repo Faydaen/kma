@@ -24,6 +24,7 @@ class ClickHouse
 
         curl_close($ch);
 
+//        var_dump($response); die();
         return json_decode($response, true);
     }
 

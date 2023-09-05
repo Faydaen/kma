@@ -96,25 +96,12 @@ function makeClickHouseQuery(): void
 {
     $clickHouseClient = new ClickHouse();
     /** @noinspection SqlResolve */
-    $sql = <<<SQL
-SELECT
-    toStartOfMinute(ParseDate) AS minute,
-    count(*) AS row_count,
-    avg(ContentLength) AS avg_content_length,
-    min(ParseDate) AS first_message_time,
-    max(ParseDate) AS last_message_time
-FROM
-    parse_results
-GROUP BY
-    minute
-ORDER BY
-    minute;
-SQL;
+    $sql = 'SELECT toStartOfMinute(ParseDate) AS minute, count(*) AS row_count, avg(ContentLength) AS avg_content_length, min(ParseDate) AS first_message_time, max(ParseDate) AS last_message_time FROM parse_results GROUP BY minute ORDER BY minute';
 
     echo '--------- Запрос к clickHouse: --------- ' . PHP_EOL;
     $result = $clickHouseClient->query($sql);
 
-    printQueryResult($result);
+    printQueryResult($result['data']);
 }
 
 function printQueryResult($result): void
