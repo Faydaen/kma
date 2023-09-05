@@ -12,17 +12,17 @@ const MIN_SECONDS = 5;
 const MAX_SECONDS = 30;
 
 $urls = [
-    'https://kma.biz/',
     'https://github.com/',
+    'https://laravel.com/',
     'https://hh.ru/',
     'https://www.youtube.com/',
-    'https://www.instagram.com/',
+    'https://mail.ru/',
     'https://habr.com/',
-    'https://ru.wikipedia.org/',
-    'https://www.docker.com/',
+    'https://www.britannica.com/',
     'https://huggingface.co/',
-    'https://www.google.com/',
+    'https://clickhouse.com/',
     'https://swagger.io/',
+    'https://tproger.ru/',
 ];
 
 $queue = new QueueManager();
@@ -34,7 +34,7 @@ foreach ($urls as $url) {
     $delay = mt_rand(MIN_SECONDS, MAX_SECONDS);
     echo 'Добавляем в очередь ' . $url . '. следующие добавление через ' . $delay. ' секунд'.PHP_EOL;
     if (!next($urls)) {
-//        sleep($delay);
+        sleep($delay);
     }
 }
 

@@ -41,8 +41,11 @@ function getContentLength(string $url): int
     // получим длину контента из заголовков ответа
     $contentLength = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
 
+    // в случае если не удается получить информацию из заголовков, получаем весь контент
+    // и считает его длину в лоб
     if ($contentLength === false || $contentLength < 0) {
-        throw new Exception("не удалось получить длину контента");
+        $content = file_get_contents($url);
+        $contentLength = strlen($content);
     }
 
     return $contentLength;
