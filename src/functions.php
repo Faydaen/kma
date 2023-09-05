@@ -48,10 +48,9 @@ function getContentLength(string $url): int
     return $contentLength;
 }
 
-
-function insertToClickHouse($url, $contentLength): void
+function insertInClickHouse($url, $contentLength): void
 {
-    $clickHouseClient = new \App\ClickHouse();
+    $clickHouseClient = new ClickHouse();
 
     $safeContentLength = filter_var($contentLength, FILTER_VALIDATE_INT);
     $safeUrl = filter_var($url, FILTER_VALIDATE_URL);
@@ -73,7 +72,6 @@ function insertInMariaDB($url, $contentLength): void
 
 function makeMariaDbQuery(): void
 {
-    echo '--------- Запрос к mariaDB: --------- ' . PHP_EOL;
     $sql = <<<SQL
 SELECT
     DATE_FORMAT(parsed_at, '%i') AS minute,
@@ -89,9 +87,37 @@ ORDER BY
     minute;
 SQL;
 
-
+    echo '--------- Запрос к mariaDB: --------- ' . PHP_EOL;
     $result = MariaDb::query($sql);
+    printQueryResult($result);
+}
 
+function makeClickHouseQuery(): void
+{
+    $clickHouseClient = new ClickHouse();
+    /** @noinspection SqlResolve */
+    $sql = <<<SQL
+SELECT
+    toStartOfMinute(ParseDate) AS minute,
+    count(*) AS row_count,
+    avg(ContentLength) AS avg_content_length,
+    min(ParseDate) AS first_message_time,
+    max(ParseDate) AS last_message_time
+FROM
+    your_table
+GROUP BY
+    minute_start
+ORDER BY
+    minute_start;
+SQL;
+
+    echo '--------- Запрос к clickHouse: --------- ' . PHP_EOL;
+    $result = $clickHouseClient->query('SELECT * FROM parse_results');
+    printQueryResult($result);
+}
+
+function printQueryResult($result): void
+{
     foreach ($result as $row) {
         echo 'Минута парса: ' . $row['minute'] . PHP_EOL;
         echo 'Количество строк: ' . $row['row_count'] . PHP_EOL;
@@ -100,11 +126,4 @@ SQL;
         echo 'Время записи последнего сообщения в эту минуту: ' . $row['last_message_time'] . PHP_EOL;
         echo PHP_EOL;
     }
-}
-
-function makeClickHouseQuery(): void
-{
-    $clickHouseClient = new \App\ClickHouse();
-
-    $result = $clickHouseClient->query('SELECT * FROM parse_results');
 }

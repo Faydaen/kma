@@ -2,21 +2,16 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use App\MariaDb;
 use App\QueueManager;
 use App\Enums\Channel;
+use function App\insertInMariaDB;
 use function App\getContentLength;
-use function App\insertToClickHouse;
 use function App\makeMariaDbQuery;
+use function App\insertInClickHouse;
+use function App\makeClickHouseQuery;
 use PhpAmqpLib\Message\AMQPMessage;
 
 $queue = new QueueManager();
-
-
-function insertInMariaDB(string $body, int $contentLength)
-{
-
-}
 
 $parseUrl = function (AMQPMessage $msg) {
 
@@ -33,12 +28,13 @@ $parseUrl = function (AMQPMessage $msg) {
 
     // добавляем в базу
     insertInMariaDB($msg->body, $contentLength);
-    insertToClickHouse($msg->body, $contentLength);
+    insertInClickHouse($msg->body, $contentLength);
 };
 
 
 $makeSqlQuery = function (AMQPMessage $msg) {
     makeMariaDbQuery();
+    makeClickHouseQuery();
 };
 
 $queue->listen(Channel::PARSE_URL, $parseUrl);

@@ -32,6 +32,7 @@ foreach ($urls as $url) {
 
     // если есть следующий урл в массиве, то делам задержку
     $delay = mt_rand(MIN_SECONDS, MAX_SECONDS);
+    echo 'Добавляем в очередь ' . $url . '. следующие добавление через ' . $delay. ' секунд'.PHP_EOL;
     if (!next($urls)) {
 //        sleep($delay);
     }
