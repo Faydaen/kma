@@ -6,40 +6,39 @@ use App\MariaDb;
 use App\QueueManager;
 use App\Enums\Channel;
 use function App\getContentLength;
+use function App\insertToClickHouse;
+use function App\makeMariaDbQuery;
 use PhpAmqpLib\Message\AMQPMessage;
 
 $queue = new QueueManager();
 
 
+function insertInMariaDB(string $body, int $contentLength)
+{
+
+}
+
 $parseUrl = function (AMQPMessage $msg) {
 
     $url = $msg->body;
     try {
-        echo 'Определяем длину контента для ' . $url . PHP_EOL;
+        echo 'Определяем длину контента для ' . $url . '... ';
         $contentLength = getContentLength($url);
     } catch (Exception $e) {
-        echo 'Ошибка: ' . $e->getMessage() . PHP_EOL;
+        echo 'Ошибка: ' . $e->getMessage() . PHP_EOL;;
         return;
     }
 
-    echo 'Длина = ' . $contentLength . ' байт' . PHP_EOL;;
+    echo 'Успех: длина = ' . $contentLength . ' байт' . PHP_EOL;
 
-    // делаем запрос
-    $sql = 'INSERT INTO parse_results (url, content_length) VALUES (:url, :content_length)';
-    $params = [
-        'url' => $msg->body,
-        'content_length' => $contentLength
-    ];
-    MariaDb::query($sql, $params);
-    echo $msg->body;
-
-    echo PHP_EOL;
+    // добавляем в базу
+    insertInMariaDB($msg->body, $contentLength);
+    insertToClickHouse($msg->body, $contentLength);
 };
 
 
 $makeSqlQuery = function (AMQPMessage $msg) {
-    echo 'end ';
-    echo PHP_EOL;
+    makeMariaDbQuery();
 };
 
 $queue->listen(Channel::PARSE_URL, $parseUrl);

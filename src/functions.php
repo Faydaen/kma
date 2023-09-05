@@ -2,26 +2,6 @@
 
 namespace App;
 
-//
-///**
-// * Получить переменную окружения
-// * @param string $name имя переменой окружения
-// * @param string|null $default что подставить если такой переменой не найдено
-// * @throws Exception
-// */
-//function env(string $name, string $default = null): string
-//{
-//    if (isset($_ENV[$name])) {
-//        return $_ENV[$name];
-//    }
-//
-//    if (!$default) {
-//        throw new Exception('Не обнаружена переменная окружения ' . $name . ' и не было передано значение по умолчанию');
-//    }
-//
-//    return $default;
-//}
-
 use Exception;
 
 /**
@@ -34,8 +14,8 @@ function getContentLength(string $url): int
     // параметры запроса
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // не выводим ничего (возвращаем в виде строки)
     curl_setopt($ch, CURLOPT_NOBODY, true); // не получаем тело запроса (длину получим из заголовка)
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5); // ожидание соединения в секундах
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10); // ожидание ответа в секундах
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 15); // ожидание соединения в секундах
+    curl_setopt($ch, CURLOPT_TIMEOUT, 20); // ожидание ответа в секундах
 
     // делаем запрос
     $response = curl_exec($ch);
@@ -44,7 +24,7 @@ function getContentLength(string $url): int
     if ($response === false) {
         $error = curl_error($ch);
         curl_close($ch);
-        throw new Exception("Не удалось получить контент. Ошибка: $error");
+        throw new Exception("не удалось получить контент: $error");
     }
 
     // получим информацию о запросе
@@ -55,17 +35,76 @@ function getContentLength(string $url): int
 
     // проверим статус ответа
     if ($httpCode >= 400) {
-        throw new Exception("Запрос завершился с HTTP-статусом $httpCode");
+        throw new Exception("запрос завершился с HTTP-статусом $httpCode");
     }
 
     // получим длину контента из заголовков ответа
     $contentLength = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
 
     if ($contentLength === false || $contentLength < 0) {
-        throw new Exception("Не удалось получить длину контента");
+        throw new Exception("не удалось получить длину контента");
     }
 
     return $contentLength;
 }
 
 
+function insertToClickHouse($url, $contentLength): void
+{
+    $clickHouseClient = new \App\ClickHouse();
+
+    $safeContentLength = filter_var($contentLength, FILTER_VALIDATE_INT);
+    $safeUrl = filter_var($url, FILTER_VALIDATE_URL);
+    /** @noinspection SqlResolve */
+    $sql = sprintf("INSERT INTO parse_results (ContentLength, Url) VALUES ('%s', '%s')", $safeContentLength, $safeUrl);
+
+    $clickHouseClient->insert($sql);
+}
+
+function insertInMariaDB($url, $contentLength): void
+{
+    $sql = 'INSERT INTO parse_results (url, content_length) VALUES (:url, :content_length)';
+    $params = [
+        'url' => $url,
+        'content_length' => $contentLength
+    ];
+    MariaDb::insert($sql, $params);
+}
+
+function makeMariaDbQuery(): void
+{
+    echo '--------- Запрос к mariaDB: --------- ' . PHP_EOL;
+    $sql = <<<SQL
+SELECT
+    DATE_FORMAT(parsed_at, '%i') AS minute,
+    COUNT(*) AS row_count,
+    AVG(content_length) AS avg_content_length,
+    MIN(parsed_at) AS first_message_time,
+    MAX(parsed_at) AS last_message_time
+FROM
+    parse_results
+GROUP BY
+    minute
+ORDER BY
+    minute;
+SQL;
+
+
+    $result = MariaDb::query($sql);
+
+    foreach ($result as $row) {
+        echo 'Минута парса: ' . $row['minute'] . PHP_EOL;
+        echo 'Количество строк: ' . $row['row_count'] . PHP_EOL;
+        echo 'Средня длина контента: ' . $row['avg_content_length'] . PHP_EOL;
+        echo 'Время записи первого сообщения в эту минуту: ' . $row['first_message_time'] . PHP_EOL;
+        echo 'Время записи последнего сообщения в эту минуту: ' . $row['last_message_time'] . PHP_EOL;
+        echo PHP_EOL;
+    }
+}
+
+function makeClickHouseQuery(): void
+{
+    $clickHouseClient = new \App\ClickHouse();
+
+    $result = $clickHouseClient->query('SELECT * FROM parse_results');
+}

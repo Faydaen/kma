@@ -5,41 +5,25 @@ use function App\getContentLength;
 require_once __DIR__ . '/vendor/autoload.php';
 
 
-$a = \App\MariaDb::query("SELECT * FROM parse_results");
-var_dump($a);
-//// Пример использования
-//try {
-//    $url = "https://www.example.com";
-//    $length = getContentLength($url);
-//    echo "Длина контента по URL $url: $length байтов";
-//} catch (Exception $e) {
-//    echo "Ошибка: " . $e->getMessage();
-//}
+//$clickHouseClient = new \App\ClickHouse();
+//$result = $clickHouseClient->query('SELECT * FROM parse_results');
+//var_dump($result['data']);
+//
+//
+//$url = 'http://adddd.ru/';
+//$contentLength = '1';
+//
+//$safeContentLength = filter_var($contentLength, FILTER_VALIDATE_INT);
+//$safeUrl = filter_var($url, FILTER_VALIDATE_URL);
+///** @noinspection SqlResolve */
+//$sql = sprintf("INSERT INTO parse_results (ContentLength, Url) VALUES ('%s', '%s')", $safeContentLength, $safeUrl);
+//
+//$clickHouseClient->insert($sql);
+//
+//echo $sql . PHP_EOL;
 
-//$myVar = getenv('CLICKHOUSE_USER');
-//echo $myVar;
-//die();
-//
-//var_dump($_ENV);
-//die();
 
-//$db = new \App\ClickHouse();
-//$a=$db->query("SELECT * FROM parse_results");
-//var_dump($a);
-//try {
-//    $pdo = new PDO('clickhouse:host=clickhouse;port=8123;dbname=default', 'username', 'my_password');
-//    // Укажите адрес и порт ClickHouse, а также имя базы данных, пользователя и пароль
-//
-//    $query = "SELECT * FROM your_table";
-//    $stmt = $pdo->prepare($query);
-//    $stmt->execute();
-//
-//    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-//        print_r($row);
-//    }
-//} catch (PDOException $e) {
-//    echo "Ошибка подключения к ClickHouse: " . $e->getMessage();
-//}
+
 
 
 

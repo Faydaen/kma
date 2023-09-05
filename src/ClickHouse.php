@@ -2,6 +2,7 @@
 
 namespace App;
 
+use CurlHandle;
 use PDO;
 use Exception;
 use PDOException;
@@ -9,39 +10,54 @@ use PDOException;
 class ClickHouse
 {
     private PDO $pdo;
-    public function __construct()
+
+    public function query($query): array
     {
-        $this->connect();
+        $ch = $this->getCurl();
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $query.' FORMAT JSON');
+
+        $response = curl_exec($ch);
+
+        if (curl_errno($ch)) {
+            echo 'Ошибка cURL: ' . curl_error($ch);
+        }
+
+        curl_close($ch);
+
+        return json_decode($response, true);
     }
 
-    private function connect(): void
+    public function insert($query): void
     {
-        try {
-            // конфигурацию подключения либо находится в переменных окружения либо указаны в docker-compose.yaml
-            $host = 'clickhouse';
-            $port = '3306';
-            $username = getenv('CLICKHOUSE_USER');
-            $password = getenv('CLICKHOUSE_PASSWORD');
-            $database = getenv('CLICKHOUSE_DB');
+        $ch = $this->getCurl();
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $query);
 
-            // подключаемся к базе данных
-            $this->pdo = new PDO("clickhouse:host=$host:$port;dbname=$database", $username, $password);
+        curl_exec($ch);
 
-            // просим получать результаты в формате ассоциативного массива
-            $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            die("Ошибка подключения к базе данных: " . $e->getMessage());
-        } catch (Exception $e) {
-            die($e->getMessage());
+        if (curl_errno($ch)) {
+            echo 'Ошибка cURL: ' . curl_error($ch);
         }
+
+        curl_close($ch);
     }
 
-    public function query(string $query) : array {
-        try {
-            $result = $this->pdo->query($query);
-            return $result->fetchAll();
-        } catch (PDOException $e) {
-            die("Ошибка выполнения запроса: " . $e->getMessage());
-        }
+    private function getCurl(): CurlHandle
+    {
+        $host = 'clickhouse';
+        $port = '8123';
+        $username = getenv('CLICKHOUSE_USER');
+        $password = getenv('CLICKHOUSE_PASSWORD');
+        $database = getenv('CLICKHOUSE_DB');
+
+        $url = "http://$username:$password@$host:$port?database=$database";
+
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        return $ch;
     }
 }

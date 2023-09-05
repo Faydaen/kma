@@ -36,7 +36,7 @@ class MariaDb
             // просим получать результаты в формате ассоциативного массива
             self::$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            die("Ошибка подключения к базе данных: " . $e->getMessage());
+            die('Ошибка подключения к базе данных: ' . $e->getMessage());
         } catch (Exception $e) {
             die($e->getMessage());
         }
@@ -54,7 +54,11 @@ class MariaDb
 
     public static function insert(string $query, array $params): void
     {
-        self::getInstance()::$pdo->prepare($query)->execute($params);
+        try {
+            self::getInstance()::$pdo->prepare($query)->execute($params);
+        } catch (PDOException $e) {
+            die('Ошибка выполнения запроса: ' . $e->getMessage());
+        }
     }
 
     public static function query(string $query, array $params = []): array
@@ -63,7 +67,9 @@ class MariaDb
             $result = self::getInstance()::$pdo->query($query);
             return $result->fetchAll();
         } catch (PDOException $e) {
-            die("Ошибка выполнения запроса: " . $e->getMessage());
+            die('Ошибка выполнения запроса: ' . $e->getMessage());
         }
     }
+
+
 }
