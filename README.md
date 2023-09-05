@@ -14,21 +14,12 @@ docker-compose run
 ```
 Дождаться пока всё запуститься
 
-После этого зайти в контейнер app
-```bash
-docker exec -it app bash
-```
-Выполнить там установку composer зависимостей 
-```bash
-composer install
-```
-
 Далее выполнить скрипт, который добавляет в очередь все url
 ```bash
-php sendUrlsToQueue.php 
+docker exec -it app php sendUrlsToQueue.php
 ```
 
-Далее (всё ещё внутри контейнера) выполнить скрипт, который обрабатывает очередь
+Затем выполнить скрипт, который обрабатывает очередь
 ```bash
-php processQueue.php
+docker exec -it app php processQueue.php
 ```

@@ -3,14 +3,9 @@
 namespace App;
 
 use CurlHandle;
-use PDO;
-use Exception;
-use PDOException;
 
 class ClickHouse
 {
-    private PDO $pdo;
-
     public function query($query): array
     {
         $ch = $this->getCurl();
@@ -24,7 +19,6 @@ class ClickHouse
 
         curl_close($ch);
 
-//        var_dump($response); die();
         return json_decode($response, true);
     }
 

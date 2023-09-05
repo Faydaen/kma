@@ -61,7 +61,7 @@ class MariaDb
         }
     }
 
-    public static function query(string $query, array $params = []): array
+    public static function query(string $query): array
     {
         try {
             $result = self::getInstance()::$pdo->query($query);

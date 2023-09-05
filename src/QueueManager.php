@@ -10,7 +10,6 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class QueueManager
 {
-    private array $eventHandlers = [];
     private AMQPChannel $channel;
     private AMQPStreamConnection $connection;
 
@@ -58,7 +57,6 @@ class QueueManager
         while (count($this->channel->callbacks)) {
             $this->channel->wait();
         }
-
     }
 
     public function closeConnection(): void

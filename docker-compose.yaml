@@ -8,6 +8,7 @@ services:
         image: app
         container_name: app
         hostname: app
+        command: 'sh -c "composer install && php-fpm"'
         volumes:
             - ./:/app
         depends_on:
